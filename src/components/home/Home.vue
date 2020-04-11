@@ -148,4 +148,7 @@ export default {
     width: 100%;
   }
 }
+.home-main {
+  background: #eaedf1;
+}
 </style>
