@@ -48,16 +48,21 @@ export default {
     async login() {
       // await 后面的异步操作有结果之后，再之后后面的代码
       const res = await this.$http.post('login', this.loginData)
-      // console.log(res)
+      console.log(res)
       const {
+        data,
         meta: { msg, status }
       } = res.data
       // 登录成功，提示登录成功,并跳转
       if (status === 200) {
         this.$message.success(msg)
+        //  1、将登陆成功之后的token, 保存到客户端的sessionStorage中; localStorage中是持久化的保存
+        //   1.1 项目中出现了登录之外的其他API接口，必须在登陆之后才能访问
+        //   1.2 token 只应在当前网站打开期间生效，所以将token保存在sessionStorage中
+        sessionStorage.setItem('token', data.token)
         this.$router.push({ name: 'home' })
       } else {
-      // 不成功，提示登录失败信息
+        // 不成功，提示登录失败信息
         this.$message.warning(msg)
       }
     }
