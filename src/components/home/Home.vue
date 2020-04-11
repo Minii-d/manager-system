@@ -9,7 +9,7 @@
         <el-button type="info" @click="logout">退出</el-button>
       </el-header>
       <el-container>
-        <el-aside width="240px" class="home-aside">
+        <el-aside width="200px" class="home-aside">
           <el-menu
             default-active="2"
             class="el-menu-vertical-demo"
