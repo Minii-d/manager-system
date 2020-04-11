@@ -16,7 +16,7 @@
       </el-form-item>
       <el-row class="btn">
         <el-button type="primary" @click.prevent="login()">登录</el-button>
-        <el-button type="info">重置</el-button>
+        <el-button type="info" @click="reset">重置</el-button>
       </el-row>
     </el-form>
   </div>
@@ -65,6 +65,10 @@ export default {
         // 不成功，提示登录失败信息
         this.$message.warning(msg)
       }
+    },
+    reset() {
+      this.loginData.username = ''
+      this.loginData.password = ''
     }
   }
 }

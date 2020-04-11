@@ -13,12 +13,11 @@
           <el-menu
             default-active="2"
             class="el-menu-vertical-demo"
-            @open="handleOpen"
-            @close="handleClose"
             background-color="#333744"
             text-color="#fff"
             active-text-color="#ffd04b"
-            unique-opened="true"
+            unique-opened
+            :router="true"
           >
             <!-- 1 -->
             <el-submenu index="1">
@@ -26,7 +25,7 @@
                 <i class="el-icon-location"></i>
                 <span>用户管理</span>
               </template>
-              <el-menu-item index="1-1">
+              <el-menu-item index="users">
                 <i class="el-icon-location"></i>
                 <span>用户列表</span>
               </el-menu-item>
@@ -89,7 +88,9 @@
             </el-submenu>
           </el-menu>
         </el-aside>
-        <el-main class="home-main">Main</el-main>
+        <el-main class="home-main">
+          <router-view></router-view>
+        </el-main>
       </el-container>
     </el-container>
   </div>
@@ -100,14 +101,23 @@ export default {
   data() {
     return {}
   },
+  // 在渲染之前操作
+  beforeCreate() {
+    // 获取token
+    const token = sessionStorage.getItem('token')
+    if (!token) {
+      // 没token，登录页
+      this.$router.push({ name: 'login' })
+    } else {
+      // 有token，渲染home
+    }
+  },
+
   methods: {
-    handleOpen(key, keyPath) {
-      console.log(key, keyPath)
-    },
-    handleClose(key, keyPath) {
-      console.log(key, keyPath)
-    },
-    logout() {}
+    logout() {
+      sessionStorage.clear('token')
+      this.$router.push({ name: 'login' })
+    }
   }
 }
 </script>
@@ -133,6 +143,7 @@ export default {
 }
 .home-aside {
   background: #333744;
+  overflow: hidden;
   .el-menu-vertical-demo {
     width: 100%;
   }
