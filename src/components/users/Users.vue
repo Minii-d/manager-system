@@ -18,6 +18,7 @@
       <el-button type="primary">添加用户</el-button>
     </el-card>
     <!-- 列表 -->
+    <!-- 数据源userList -->
     <el-table :data="userList" stripe style="width: 100%">
       <el-table-column type="index" width="50" label="序号"> </el-table-column>
       <el-table-column prop="username" label="姓名" width="80">
@@ -28,6 +29,12 @@
       <el-table-column prop="role_name" label="角色" width="120">
       </el-table-column>
       <el-table-column prop="create_time" label="创建时间" width="120">
+        <!-- 格式化时间过滤器，需要使用template，通过slot-scope传值，scoped就代表userList为数据源，自带的row属性,代表userList中的每个元素，在通过每个元素找到对应的数据 -->
+        <!-- users的数据 id: (...) role_name: (...) username: (...) create_time:
+        1486720211 mobile: (...) email: (...) mg_state: (...) -->
+        <template slot-scope="scoped">
+          {{ scoped.row.create_time | formatTime }}
+        </template>
       </el-table-column>
       <el-table-column prop="mg_state" label="状态"> </el-table-column>
       <el-table-column prop="oprator" label="操作"> </el-table-column>
@@ -36,8 +43,6 @@
   </div>
 </template>
 
-// id: (...) // username: (...) // email: (...) // mobile: (...) // role_name:
-(...) // create_time: (...) // mg_state: (...)
 <script>
 export default {
   data() {
@@ -77,7 +82,7 @@ export default {
       const res = await this.$http.get(
         `users?query=${this.queryInfo.query}&pagenum=${this.queryInfo.pagenum}&pagesize=${this.queryInfo.pagesize}`
       )
-      console.log(res)
+      console.log(res.data.data)
       const {
         data: { total, pagenum, users },
         meta: { msg, status }
