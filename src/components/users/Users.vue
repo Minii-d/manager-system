@@ -28,18 +28,67 @@
       </el-table-column>
       <el-table-column prop="role_name" label="角色" width="120">
       </el-table-column>
+
       <el-table-column prop="create_time" label="创建时间" width="120">
         <!-- 格式化时间过滤器，需要使用template，通过slot-scope传值，scoped就代表userList为数据源，自带的row属性,代表userList中的每个元素，在通过每个元素找到对应的数据 -->
         <!-- users的数据 id: (...) role_name: (...) username: (...) create_time:
         1486720211 mobile: (...) email: (...) mg_state: (...) -->
-        <template slot-scope="scoped">
-          {{ scoped.row.create_time | formatTime }}
+        <template slot-scope="scope">
+          {{ scope.row.create_time | formatTime }}
         </template>
       </el-table-column>
-      <el-table-column prop="mg_state" label="状态"> </el-table-column>
-      <el-table-column prop="oprator" label="操作"> </el-table-column>
+
+      <el-table-column label="状态" width="120">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.mg_state"
+            active-color="#13ce66"
+            inactive-color="#ff4949"
+          >
+          </el-switch>
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="oprator" label="操作">
+        <template>
+          <el-row>
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              circle
+              plain
+              size="mini"
+            ></el-button>
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              circle
+              plain
+              size="mini"
+            ></el-button>
+            <el-button
+              type="success"
+              icon="el-icon-check"
+              circle
+              plain
+              size="mini"
+            ></el-button>
+          </el-row>
+        </template>
+      </el-table-column>
     </el-table>
     <!-- 分页 -->
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="queryInfo.pagenum"
+      :page-sizes="[3, 6, 9, 12]"
+      :page-size="3"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total"
+      class="pagination"
+    >
+    </el-pagination>
   </div>
 </template>
 
@@ -59,11 +108,9 @@ export default {
         pagesize: 3
       },
       // 分页相关数据
-      pagenation: {
-        total: -1,
-        pagenum: 1,
-        pagesize: 4
-      }
+      total: -1,
+      // switch开关
+      value: true
     }
   },
   mounted() {
@@ -71,7 +118,7 @@ export default {
     this.getUserList()
   },
   methods: {
-    //  请求数据
+    //  请求数据--------------------------------
     async getUserList() {
       // 该项目接口文档要求除了登录之外，需要授权的 API ，必须在请求头中使用 `Authorization` 字段提供 `token` 令牌
       // 先拿到token令牌
@@ -90,11 +137,19 @@ export default {
       if (status === 200) {
         // 将请求到的数据存到data中
         this.userList = users
-        this.pagenation.total = total
+        this.total = total
         this.$message.success(msg)
       } else {
         this.$message.warning(msg)
       }
+    },
+
+    // 分页相关功能------------------------------
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`)
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`)
     }
   }
 }
@@ -102,14 +157,22 @@ export default {
 
 <style lang="less" scoped>
 .users {
+  background: #fff;
+  height: 100%;
   .breadcrumb {
-    margin-bottom: 20px;
+    padding: 20px;
+    background: #eaedf1;
   }
   .box-card {
+    border: none;
+    box-shadow: none;
     .input-with-select {
       width: 300px;
       margin-right: 20px;
     }
+  }
+  .pagination {
+    padding: 30px;
   }
 }
 </style>
