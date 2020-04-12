@@ -129,9 +129,9 @@ export default {
       const res = await this.$http.get(
         `users?query=${this.queryInfo.query}&pagenum=${this.queryInfo.pagenum}&pagesize=${this.queryInfo.pagesize}`
       )
-      console.log(res.data.data)
+      console.log(res.data)
       const {
-        data: { total, pagenum, users },
+        data: { total, users, pagenum },
         meta: { msg, status }
       } = res.data
       if (status === 200) {
@@ -145,11 +145,19 @@ export default {
     },
 
     // 分页相关功能------------------------------
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`)
+    // 当每页条数改变时触发，更新pagesize，重新请求数据
+    handleSizeChange(pagesize) {
+      console.log(`每页 ${pagesize} 条`)
+      this.queryInfo.pagesize = pagesize
+      // 每次切换每页条数时，都是从第1条开始显示
+      this.queryInfo.pagenum = 1
+      this.getUserList()
     },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`)
+    // 当前页改变时触发，更新pagenum，重新请求数据
+    handleCurrentChange(pagenum) {
+      console.log(`当前页: ${pagenum}`)
+      this.queryInfo.pagenum = pagenum
+      this.getUserList()
     }
   }
 }
