@@ -22,30 +22,34 @@
           @click="searchUser"
         ></el-button>
       </el-input>
-      <el-button type="primary" @click="addUser">添加用户</el-button>
+      <el-button type="primary" @click="showAddUser">添加用户</el-button>
     </el-card>
 
     <!-- 添加用户对话框 -->
     <el-dialog title="添加用户" :visible.sync="dialogFormVisibleAdd">
-      <el-form :model="form">
-        <el-form-item label="用户名" label-width="120px">
-          <el-input v-model="form.name" autocomplete="off"></el-input>
+      <el-form :model="addUserForm">
+        <el-form-item label="用户名" label-width="100px">
+          <el-input
+            v-model="addUserForm.username"
+            autocomplete="off"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="密码" label-width="120px">
-          <el-input v-model="form.password" autocomplete="off"></el-input>
+        <el-form-item label="密码" label-width="100px">
+          <el-input
+            v-model="addUserForm.password"
+            autocomplete="off"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="邮箱" label-width="120px">
-          <el-input v-model="form.email" autocomplete="off"></el-input>
+        <el-form-item label="邮箱" label-width="100px">
+          <el-input v-model="addUserForm.email" autocomplete="off"></el-input>
         </el-form-item>
-        <el-form-item label="手机" label-width="120px">
-          <el-input v-model="form.mobile" autocomplete="off"></el-input>
+        <el-form-item label="手机" label-width="100px">
+          <el-input v-model="addUserForm.mobile" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisibleAdd = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisibleAdd = false"
-          >确 定</el-button
-        >
+        <el-button type="primary" @click="addUser">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -144,8 +148,8 @@ export default {
       // 对话框是否显示
       dialogFormVisibleAdd: false,
       // 对话框输入框中数据
-      form: {
-        name: '',
+      addUserForm: {
+        username: '',
         password: '',
         email: '',
         mobile: ''
@@ -168,7 +172,7 @@ export default {
       const res = await this.$http.get(
         `users?query=${this.queryInfo.query}&pagenum=${this.queryInfo.pagenum}&pagesize=${this.queryInfo.pagesize}`
       )
-      console.log(res.data)
+      console.log('getUserList请求数据：', res.data)
       const {
         data: { total, users },
         meta: { msg, status }
@@ -210,8 +214,24 @@ export default {
     },
     // 添加用户事件
     // 点击添加用户按钮，显示对话框；点击取消，对话框隐藏；点击确定，对话框隐藏；同时添加数据的请求
-    addUser() {
+    showAddUser() {
       this.dialogFormVisibleAdd = true
+    },
+    async addUser() {
+      // 无论添加取消都关闭对话框
+      this.dialogFormVisibleAdd = false
+      const res = await this.$http.post('users', this.addUserForm)
+      const {
+        meta: { msg, status },
+        data
+      } = res.data
+      if (status === 201) {
+        this.getUserList()
+        this.$message.success(msg)
+        this.addUserForm = {}
+      } else {
+        this.$message.warning(msg)
+      }
     }
   }
 }
