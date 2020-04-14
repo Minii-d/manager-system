@@ -6,17 +6,49 @@
       <el-breadcrumb-item>用户管理</el-breadcrumb-item>
       <el-breadcrumb-item>用户列表</el-breadcrumb-item>
     </el-breadcrumb>
+
     <!-- 搜索框 -->
     <el-card class="box-card">
       <el-input
+        clearable
+        @clear="clear"
         placeholder="请输入内容"
         v-model="queryInfo.query"
         class="input-with-select"
       >
-        <el-button slot="append" icon="el-icon-search"></el-button>
+        <el-button
+          slot="append"
+          icon="el-icon-search"
+          @click="searchUser"
+        ></el-button>
       </el-input>
-      <el-button type="primary">添加用户</el-button>
+      <el-button type="primary" @click="addUser">添加用户</el-button>
     </el-card>
+
+    <!-- 添加用户对话框 -->
+    <el-dialog title="添加用户" :visible.sync="dialogFormVisibleAdd">
+      <el-form :model="form">
+        <el-form-item label="用户名" label-width="120px">
+          <el-input v-model="form.name" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" label-width="120px">
+          <el-input v-model="form.password" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" label-width="120px">
+          <el-input v-model="form.email" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="手机" label-width="120px">
+          <el-input v-model="form.mobile" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisibleAdd = false">取 消</el-button>
+        <el-button type="primary" @click="dialogFormVisibleAdd = false"
+          >确 定</el-button
+        >
+      </div>
+    </el-dialog>
+
     <!-- 列表 -->
     <!-- 数据源userList -->
     <el-table :data="userList" stripe style="width: 100%">
@@ -28,7 +60,6 @@
       </el-table-column>
       <el-table-column prop="role_name" label="角色" width="120">
       </el-table-column>
-
       <el-table-column prop="create_time" label="创建时间" width="120">
         <!-- 格式化时间过滤器，需要使用template，通过slot-scope传值，scoped就代表userList为数据源，自带的row属性,代表userList中的每个元素，在通过每个元素找到对应的数据 -->
         <!-- users的数据 id: (...) role_name: (...) username: (...) create_time:
@@ -37,7 +68,6 @@
           {{ scope.row.create_time | formatTime }}
         </template>
       </el-table-column>
-
       <el-table-column label="状态" width="120">
         <template slot-scope="scope">
           <el-switch
@@ -48,7 +78,6 @@
           </el-switch>
         </template>
       </el-table-column>
-
       <el-table-column prop="oprator" label="操作">
         <template>
           <el-row>
@@ -77,6 +106,7 @@
         </template>
       </el-table-column>
     </el-table>
+
     <!-- 分页 -->
     <el-pagination
       @size-change="handleSizeChange"
@@ -109,8 +139,17 @@ export default {
       },
       // 分页相关数据
       total: -1,
-      // switch开关
-      value: true
+      // 状态switch开关
+      value: true,
+      // 对话框是否显示
+      dialogFormVisibleAdd: false,
+      // 对话框输入框中数据
+      form: {
+        name: '',
+        password: '',
+        email: '',
+        mobile: ''
+      }
     }
   },
   mounted() {
@@ -131,7 +170,7 @@ export default {
       )
       console.log(res.data)
       const {
-        data: { total, users, pagenum },
+        data: { total, users },
         meta: { msg, status }
       } = res.data
       if (status === 200) {
@@ -158,6 +197,21 @@ export default {
       console.log(`当前页: ${pagenum}`)
       this.queryInfo.pagenum = pagenum
       this.getUserList()
+    },
+
+    // 搜索功能
+    // 根据query参数搜索，query已经双向绑定，改变后会自动更新，此处不用再做其他处理
+    searchUser() {
+      this.getUserList()
+    },
+    // 属性框清除事件
+    clear() {
+      this.getUserList()
+    },
+    // 添加用户事件
+    // 点击添加用户按钮，显示对话框；点击取消，对话框隐藏；点击确定，对话框隐藏；同时添加数据的请求
+    addUser() {
+      this.dialogFormVisibleAdd = true
     }
   }
 }
