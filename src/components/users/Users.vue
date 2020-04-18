@@ -82,8 +82,9 @@
           </el-switch>
         </template>
       </el-table-column>
+      <!-- 操作  -->
       <el-table-column prop="oprator" label="操作">
-        <template>
+        <template slot-scope="scope">
           <el-row>
             <el-button
               type="primary"
@@ -98,6 +99,7 @@
               circle
               plain
               size="mini"
+              @click="showDeleteMsgBox(scope.row.id)"
             ></el-button>
             <el-button
               type="success"
@@ -203,7 +205,7 @@ export default {
       this.getUserList()
     },
 
-    // 搜索功能
+    // 搜索功能---------------------------------------
     // 根据query参数搜索，query已经双向绑定，改变后会自动更新，此处不用再做其他处理
     searchUser() {
       this.getUserList()
@@ -212,7 +214,8 @@ export default {
     clear() {
       this.getUserList()
     },
-    // 添加用户事件
+
+    // 添加用户事件------------------------------------------
     // 点击添加用户按钮，显示对话框；点击取消，对话框隐藏；点击确定，对话框隐藏；同时添加数据的请求
     showAddUser() {
       this.dialogFormVisibleAdd = true
@@ -222,8 +225,7 @@ export default {
       this.dialogFormVisibleAdd = false
       const res = await this.$http.post('users', this.addUserForm)
       const {
-        meta: { msg, status },
-        data
+        meta: { msg, status }
       } = res.data
       if (status === 201) {
         this.getUserList()
@@ -232,6 +234,37 @@ export default {
       } else {
         this.$message.warning(msg)
       }
+    },
+
+    // 删除功能
+    showDeleteMsgBox(id) {
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          // 成功时发请求
+          const res = await this.$http.delete(`users/${id}`)
+          const {
+            meta: { msg, status }
+          } = res.data
+          // 请求成功时操作
+          if (status === 200) {
+            this.$message({
+              type: 'success',
+              message: msg
+            })
+            this.queryInfo.pagenum = 1
+            this.getUserList()
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
     }
   }
 }
